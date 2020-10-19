@@ -63,11 +63,11 @@ void appMain(void * arg)
 		"int32_publisher"));
 
   	// create subscriber
-	// RCCHECK(rclc_subscription_init_default(
-	// 	&subscriber,
-	// 	&node,
-	// 	ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-	// 	"int32_subscriber"));
+	RCCHECK(rclc_subscription_init_default(
+		&subscriber,
+		&node,
+		ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+		"int32_subscriber"));
 
 	// create timer,
 	rcl_timer_t timer = rcl_get_zero_initialized_timer();
@@ -85,7 +85,7 @@ void appMain(void * arg)
 	unsigned int rcl_wait_timeout = 1000;   // in ms
 	RCCHECK(rclc_executor_set_timeout(&executor, RCL_MS_TO_NS(rcl_wait_timeout)));
 	RCCHECK(rclc_executor_add_timer(&executor, &timer));
-	// RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &recv_msg, &subscription_callback, ON_NEW_DATA));
+	RCCHECK(rclc_executor_add_subscription(&executor, &subscriber, &recv_msg, &subscription_callback, ON_NEW_DATA));
 
 	send_msg.data = 0;
 
@@ -95,7 +95,7 @@ void appMain(void * arg)
 	}
 
 	// free resources
-	// RCCHECK(rcl_subscription_fini(&subscriber, &node));
+	RCCHECK(rcl_subscription_fini(&subscriber, &node));
 	RCCHECK(rcl_publisher_fini(&publisher, &node));
 	RCCHECK(rcl_node_fini(&node));
 
