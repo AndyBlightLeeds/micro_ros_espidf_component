@@ -1,10 +1,11 @@
 # micro-ROS component for ESP-IDF
 
-This component has been tested in ESP-IDF v4.1
+This component has been tested with ESP-IDF v4.1 using
+[a docker container](#-Build-with-docker-container).
 
 ## Dependencies
 
-This componentes needs `colcon` in order to build micro-ROS packages:
+This component needs `colcon` in order to build micro-ROS packages:
 
 <!-- apt install lsb-release git -->
 ```bash
@@ -27,16 +28,61 @@ pip3 install catkin_pkg lark-parser empy
 . $IDF_PATH/export.sh
 idf.py menuconfig
 # Set your micro-ROS configuration and WiFi credentials
-idf.py build 
-idf.py flash 
-idf.py monitor 
+idf.py build
+idf.py flash
+idf.py monitor
 ```
 
-Is possible to use a micro-ROS Agent just with this docker command:
+It is possible to use a micro-ROS agent just with this docker command:
 
 ```bash
 docker run -it --rm --net=host microros/micro-ros-agent:foxy udp4 --port 8888 -v6
 ```
+
+To test the pulisher and subscriber, attach a new terminal session to the
+docker container running the agent:
+
+```bash
+docker ps  # To list the container IDs.
+docker exec -it <container_id> /bin/bash
+```
+
+To list the topics:
+
+```bash
+ros2 topic list
+/parameter_events
+/int32_publisher
+/int32_subscriber
+/rosout
+```
+
+To listen to the published topic:
+
+```bash
+ros2 topic echo /int32_publisher
+data: 4
+---
+data: 5
+---
+data: 6
+...
+```
+
+To send data to the subscriber:
+
+```bash
+ros2 topic pub /int32_subscriber std_msgs/Int32 '{"data": 37}'
+publisher: beginning loop
+publishing #1: std_msgs.msg.Int32(data=37)
+
+publishing #2: std_msgs.msg.Int32(data=37)
+
+publishing #3: std_msgs.msg.Int32(data=37)
+...
+```
+
+`Ctrl+c` to stop the publisher.
 
 ## Build with docker container
 
@@ -49,7 +95,7 @@ docker run -it --rm --user espidf --volume="/etc/timezone:/etc/timezone:ro" -v  
 Docker image microros/esp-idf-microros:latest will be automatically pulled from hub.docker.com
 and used to build an application.
 
-After build is finished build results will be accessible in a local ./build directory. 
+After build is finished build results will be accessible in a local ./build directory.
 
 Dockerfile for this container is provided in the ./docker directory.
 
